@@ -1,0 +1,54 @@
+<svg width="1200" height="720" viewBox="0 0 1200 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="120" y1="100" x2="1120" y2="680" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6" stop-opacity="0.16"/>
+      <stop offset="0.5" stop-color="#22D3EE" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#070A10" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="r" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(520 200) rotate(90) scale(420 620)">
+      <stop stop-color="#8B5CF6" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#070A10" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="30"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="720" rx="48" fill="#070A10"/>
+  <rect x="64" y="56" width="1072" height="608" rx="32" fill="url(#g)" />
+  <ellipse cx="520" cy="220" rx="360" ry="260" fill="url(#r)" filter="url(#blur)"/>
+  <g opacity="0.92">
+    <rect x="122" y="128" width="956" height="80" rx="20" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)"/>
+    <rect x="154" y="154" width="220" height="28" rx="14" fill="rgba(255,255,255,0.12)"/>
+    <rect x="400" y="154" width="140" height="28" rx="14" fill="rgba(255,255,255,0.08)"/>
+    <rect x="560" y="154" width="140" height="28" rx="14" fill="rgba(255,255,255,0.08)"/>
+    <rect x="720" y="154" width="140" height="28" rx="14" fill="rgba(255,255,255,0.08)"/>
+  </g>
+  <g opacity="0.95">
+    <rect x="122" y="236" width="956" height="130" rx="28" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)"/>
+    <rect x="154" y="266" width="180" height="18" rx="9" fill="rgba(255,255,255,0.14)"/>
+    <rect x="154" y="300" width="260" height="42" rx="21" fill="rgba(34,211,238,0.14)" stroke="rgba(255,255,255,0.10)"/>
+    <rect x="440" y="266" width="180" height="18" rx="9" fill="rgba(255,255,255,0.14)"/>
+    <rect x="440" y="300" width="260" height="42" rx="21" fill="rgba(139,92,246,0.16)" stroke="rgba(255,255,255,0.10)"/>
+    <rect x="726" y="266" width="180" height="18" rx="9" fill="rgba(255,255,255,0.14)"/>
+    <rect x="726" y="300" width="320" height="42" rx="21" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.10)"/>
+  </g>
+  <g opacity="0.95">
+    <rect x="122" y="386" width="620" height="236" rx="28" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)"/>
+    <rect x="154" y="418" width="240" height="18" rx="9" fill="rgba(255,255,255,0.14)"/>
+    <rect x="154" y="460" width="556" height="130" rx="24" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.10)"/>
+    <path d="M178 566 L238 540 L298 554 L358 510 L418 526 L478 478 L538 498 L598 456 L658 468" stroke="rgba(34,211,238,0.55)" stroke-width="4" fill="none"/>
+    <path d="M178 552 L238 526 L298 536 L358 492 L418 506 L478 456 L538 474 L598 438 L658 444" stroke="rgba(139,92,246,0.55)" stroke-width="4" fill="none"/>
+  </g>
+  <g opacity="0.95">
+    <rect x="762" y="386" width="316" height="236" rx="28" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)"/>
+    <rect x="794" y="418" width="200" height="18" rx="9" fill="rgba(255,255,255,0.14)"/>
+    <rect x="794" y="460" width="252" height="18" rx="9" fill="rgba(255,255,255,0.10)"/>
+    <rect x="794" y="492" width="220" height="18" rx="9" fill="rgba(255,255,255,0.10)"/>
+    <rect x="794" y="524" width="240" height="18" rx="9" fill="rgba(255,255,255,0.10)"/>
+    <rect x="794" y="556" width="210" height="18" rx="9" fill="rgba(255,255,255,0.10)"/>
+  </g>
+  <g opacity="0.9" fill="rgba(255,255,255,0.52)" font-family="ui-sans-serif, system-ui" font-size="18" font-weight="600">
+    <text x="154" y="104">E-commerce Dashboard  Web App Preview</text>
+  </g>
+</svg>
+
