@@ -38,7 +38,7 @@ export const PROJECTS: Project[] = [
       { label: "Real-time Calculation", icon: "realtime-calc" },
     ],
     tags: ["Next.js", "TypeScript", "Tailwind", "PostgreSQL/Supabase", "Prisma", "Vercel"],
-    imageSrc: "/projects/plyledger.svg",
+    imageSrc: "/projects/plyledger.png",
     liveUrl: "https://ply-ledger.vercel.app/",
     githubUrl: "https://github.com/example/plyledger",
     caseStudyUrl: "https://example.com",

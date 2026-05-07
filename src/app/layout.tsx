@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import FloatingLines from "@/components/floating-lines";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,7 +49,23 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <div className="fixed inset-0 -z-10 opacity-60">
+            <FloatingLines
+              enabledWaves={["top", "middle", "bottom"]}
+              lineCount={[10, 14, 18]}
+              lineDistance={[8, 6, 4]}
+              bendRadius={5}
+              bendStrength={-0.5}
+              interactive={false}
+              parallax={false}
+              animationSpeed={0.9}
+              linesGradient={["#7dd3fc", "#93c5fd", "#a78bfa"]}
+              mixBlendMode="screen"
+            />
+          </div>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
