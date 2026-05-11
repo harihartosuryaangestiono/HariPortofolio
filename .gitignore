@@ -1,8 +1,9 @@
-# Large video files (exceed GitHub 100MB limit — serve from CDN or local only)
-*.mp4
-*.mov
-*.avi
-*.webm
+# Large raw video files in project root (may exceed GitHub 100MB limit)
+/Video-UnparScraper.mp4
+/UnparScraper.mp4
+
+# Allow optimized videos inside public/ (must stay under 100MB each)
+# public/projects/*.mp4 are tracked intentionally
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
