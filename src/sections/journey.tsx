@@ -6,6 +6,35 @@ import { JOURNEY } from "@/lib/profile";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
+import ScrollReveal from "@/components/ui/scroll-reveal";
+
+const NODE_ACCENTS = [
+  {
+    dot: "bg-cyan-400",
+    badge: "text-cyan-400 border-cyan-400/40 bg-cyan-400/8",
+    glow: "rgba(34,211,238,",
+  },
+  {
+    dot: "bg-indigo-400",
+    badge: "text-indigo-400 border-indigo-400/40 bg-indigo-400/8",
+    glow: "rgba(129,140,248,",
+  },
+  {
+    dot: "bg-violet-400",
+    badge: "text-violet-400 border-violet-400/40 bg-violet-400/8",
+    glow: "rgba(167,139,250,",
+  },
+  {
+    dot: "bg-sky-400",
+    badge: "text-sky-400 border-sky-400/40 bg-sky-400/8",
+    glow: "rgba(56,189,248,",
+  },
+  {
+    dot: "bg-emerald-400",
+    badge: "text-emerald-400 border-emerald-400/40 bg-emerald-400/8",
+    glow: "rgba(52,211,153,",
+  },
+];
 
 export function JourneySection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -13,116 +42,221 @@ export function JourneySection() {
   useGSAP(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    const memories = gsap.utils.toArray<HTMLElement>(".memory-node");
-    
-    // Fade in and float up each memory as user naturally scrolls
-    memories.forEach((memory) => {
-      gsap.fromTo(memory, 
-        { opacity: 0, y: 100, filter: "blur(20px)" },
+    const nodes = gsap.utils.toArray<HTMLElement>(".journey-node");
+
+    nodes.forEach((node, i) => {
+      const accentGlow = NODE_ACCENTS[i % NODE_ACCENTS.length].glow;
+      const card = node.querySelector<HTMLElement>(".journey-card");
+      const dot = node.querySelector<HTMLElement>(".journey-dot-inner");
+      const spotlight = node.querySelector<HTMLElement>(".journey-spotlight");
+
+      // Entrance animation
+      gsap.fromTo(
+        node,
+        { opacity: 0, y: 44 },
         {
           opacity: 1,
           y: 0,
-          filter: "blur(0px)",
-          duration: 1.5,
-          ease: "power2.out",
+          duration: 1.0,
+          ease: "power3.out",
           scrollTrigger: {
-            trigger: memory,
-            start: "top 80%",
-            end: "bottom 60%",
-            toggleActions: "play none none reverse"
-          }
+            trigger: node,
+            start: "top 84%",
+            toggleActions: "play none none none",
+          },
         }
       );
+
+      // Active spotlight when node is in the reading zone
+      const activate = () => {
+        gsap.to(card, {
+          borderColor: `${accentGlow}0.35)`,
+          backgroundColor: "rgba(255,255,255,0.055)",
+          boxShadow: `0 0 60px ${accentGlow}0.10), 0 0 20px ${accentGlow}0.06), inset 0 1px 0 ${accentGlow}0.15)`,
+          duration: 0.55,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+        if (dot) gsap.to(dot, { scale: 1.35, duration: 0.4, ease: "back.out(2)" });
+        if (spotlight) gsap.to(spotlight, { opacity: 1, duration: 0.6, ease: "power2.out" });
+      };
+
+      const deactivate = () => {
+        gsap.to(card, {
+          borderColor: "rgba(255,255,255,0.09)",
+          backgroundColor: "rgba(255,255,255,0.025)",
+          boxShadow: "none",
+          duration: 0.5,
+          ease: "power2.in",
+          overwrite: "auto",
+        });
+        if (dot) gsap.to(dot, { scale: 1, duration: 0.35 });
+        if (spotlight) gsap.to(spotlight, { opacity: 0, duration: 0.5 });
+      };
+
+      ScrollTrigger.create({
+        trigger: node,
+        start: "top 68%",
+        end: "bottom 18%",
+        onEnter: activate,
+        onLeave: deactivate,
+        onEnterBack: activate,
+        onLeaveBack: deactivate,
+      });
     });
 
+    // Background glow parallax
+    gsap.to(".journey-bg-glow", {
+      y: 180,
+      ease: "none",
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: true,
+      },
+    });
   }, { scope: sectionRef });
 
   return (
-    <section id="journey" ref={sectionRef} className="relative bg-[#020617] overflow-hidden w-full py-40 border-b border-white/5">
-      <div className="absolute inset-0 w-full h-full pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,211,238,0.05)_0%,transparent_70%)]" />
-      </div>
+    <section
+      id="journey"
+      ref={sectionRef}
+      className="relative overflow-hidden w-full py-32 lg:py-40 border-b border-white/5"
+      style={{ backgroundColor: "#020b1a" }}
+    >
+      {/* ── Ambient background layers ── */}
+      {/* Primary cyan glow */}
+      <div className="journey-bg-glow absolute top-[5%] left-1/2 -translate-x-1/2 w-[1100px] h-[700px] rounded-full pointer-events-none will-change-transform"
+        style={{ background: "radial-gradient(ellipse, rgba(34,211,238,0.10) 0%, transparent 65%)" }} />
+      {/* Secondary purple ambient */}
+      <div className="absolute top-[40%] right-[-10%] w-[600px] h-[600px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(ellipse, rgba(139,92,246,0.07) 0%, transparent 60%)" }} />
+      {/* Bottom warm fill so section doesn't fall to pure black */}
+      <div className="absolute bottom-0 left-0 right-0 h-[40%] pointer-events-none"
+        style={{ background: "linear-gradient(to top, rgba(2,15,40,0.6) 0%, transparent 100%)" }} />
+      {/* Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
       <Container className="relative z-10">
-        <div className="text-center mb-40">
-          <div className="inline-flex items-center justify-center gap-2 rounded text-[10px] font-mono font-medium uppercase tracking-widest text-cyan-400 mb-6 border border-cyan-400/20 px-3 py-1 bg-cyan-400/5">
-            <span className="h-2 w-2 bg-cyan-400 animate-pulse rounded-full" />
-            SYSTEM_EVOLUTION.LOG
+
+        {/* ── Section header ── */}
+        <div className="text-center mb-24 lg:mb-32">
+          <div className="inline-flex items-center gap-2 text-[10px] font-mono font-medium uppercase tracking-[0.35em] text-cyan-300 mb-6 border border-cyan-400/30 px-3 py-1.5 rounded-full bg-cyan-400/8">
+            <span className="h-1.5 w-1.5 bg-cyan-400 animate-pulse rounded-full" />
+            004 &nbsp;/&nbsp; Memory Archive
           </div>
-          <h3 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-            Digital Archive
-          </h3>
+          <h2 className="text-5xl sm:text-7xl lg:text-8xl font-bold tracking-tighter text-white leading-[1.0]">
+            <ScrollReveal
+              blurStrength={5}
+              baseRotation={2}
+              baseOpacity={0.15}
+              stagger={0.08}
+              duration={1.1}
+              triggerStart="top 84%"
+            >
+              The Journey
+            </ScrollReveal>
+          </h2>
+          <p className="text-sm text-white/55 mt-5 max-w-xs mx-auto font-light leading-relaxed">
+            Every system built. Every problem solved. Every step forward.
+          </p>
         </div>
 
-        <div className="flex flex-col gap-40 relative">
-          {/* Subtle vertical connection line */}
-          <div className="absolute left-[30px] md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-cyan-500/20 to-transparent md:-translate-x-1/2" />
+        {/* ── Timeline ── */}
+        <div className="relative max-w-3xl mx-auto">
 
-          {JOURNEY.map((item, idx) => {
-            const isLeft = idx % 2 === 0;
-            return (
-              <div key={idx} className="memory-node relative w-full flex items-center justify-center transform-gpu will-change-transform group">
-                <div className={`flex flex-col md:flex-row items-center gap-16 md:gap-24 w-full ${isLeft ? '' : 'md:flex-row-reverse'}`}>
-                  
-                  {/* Holographic Datapoint */}
-                  <div className="w-full md:w-1/2 flex justify-center md:justify-end">
-                     <div className={`relative w-[250px] h-[250px] md:w-[400px] md:h-[400px] rounded-full flex items-center justify-center ${isLeft ? 'md:mr-10' : 'md:ml-10'}`}>
-                       {/* Floating UI elements instead of a solid border */}
-                       <div className="absolute w-full h-full rounded-full border-[1px] border-cyan-400/20 border-dashed animate-[spin_30s_linear_infinite]" />
-                       <div className="absolute w-[80%] h-[80%] rounded-full border-[2px] border-blue-500/10 border-dotted animate-[spin_20s_linear_infinite_reverse]" />
-                       <div className="absolute w-[60%] h-[60%] rounded-full bg-cyan-500/5 blur-[30px] group-hover:bg-cyan-400/10 transition-colors duration-1000" />
-                       
-                       <div className="absolute inset-0 flex items-center justify-center flex-col text-center z-10 transform transition-transform duration-1000 group-hover:scale-110">
-                         <span className="block text-5xl md:text-7xl font-mono text-white font-bold mb-2 tracking-tighter group-hover:text-cyan-300 transition-colors">{item.time.split(' ')[0]}</span>
-                         <span className="block text-[10px] md:text-xs font-mono tracking-[0.4em] uppercase text-cyan-500/80">{item.org}</span>
-                       </div>
-                       
-                       {/* Center glowing connection point */}
-                       <div className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-black border-2 border-cyan-400 rounded-full z-20 ${isLeft ? 'right-[-4.5rem] md:-right-[3.5rem]' : 'left-[-4.5rem] md:-left-[3.5rem]'} hidden md:block shadow-[0_0_15px_rgba(34,211,238,0.5)]`}>
-                          <div className="absolute inset-1 rounded-full bg-cyan-400 animate-pulse" />
-                       </div>
-                     </div>
+          {/* Vertical connector line — brighter */}
+          <div className="absolute left-5 md:left-8 top-0 bottom-0 w-px pointer-events-none"
+            style={{ background: "linear-gradient(to bottom, transparent, rgba(34,211,238,0.25) 20%, rgba(255,255,255,0.12) 50%, rgba(139,92,246,0.2) 80%, transparent)" }} />
+
+          <div className="flex flex-col gap-12 lg:gap-16">
+            {JOURNEY.map((item, idx) => {
+              const accent = NODE_ACCENTS[idx % NODE_ACCENTS.length];
+              return (
+                <div
+                  key={idx}
+                  className="journey-node relative pl-16 md:pl-24 will-change-transform"
+                >
+                  {/* Node dot */}
+                  <div className="absolute left-[11px] md:left-[20px] top-6">
+                    <div className={`journey-dot-outer w-6 h-6 rounded-full border-2 border-current ${accent.dot} bg-[#020b1a] flex items-center justify-center`}
+                      style={{ boxShadow: "0 0 14px currentColor" }}>
+                      <div className={`journey-dot-inner w-2.5 h-2.5 rounded-full ${accent.dot}`} />
+                    </div>
                   </div>
 
-                  {/* Text Information */}
-                  <div className={`w-full md:w-1/2 flex flex-col pl-[60px] md:pl-0 ${isLeft ? 'items-start text-left' : 'items-end text-right'}`}>
-                    <div className="inline-flex items-center gap-4 mb-6">
-                      <span className="h-px w-12 bg-cyan-400/50" />
-                      <span className="text-[10px] font-mono tracking-[0.4em] uppercase text-cyan-400/80">MEMORY_LOG_{idx.toString().padStart(2, '0')}</span>
+                  {/* Card */}
+                  <div
+                    className="journey-card group relative rounded-2xl p-7 md:p-8 overflow-hidden"
+                    style={{
+                      border: "1px solid rgba(255,255,255,0.09)",
+                      backgroundColor: "rgba(255,255,255,0.025)",
+                    }}
+                  >
+                    {/* Active spotlight layer — animated by GSAP */}
+                    <div
+                      className="journey-spotlight absolute inset-0 rounded-2xl pointer-events-none opacity-0"
+                      style={{ background: `radial-gradient(ellipse 80% 60% at 50% 0%, ${accent.glow}0.08) 0%, transparent 70%)` }}
+                    />
+
+                    {/* Top row: date badge + index */}
+                    <div className="relative z-10 flex items-start justify-between gap-4 mb-5">
+                      <span className={`inline-flex items-center text-[10px] font-mono tracking-widest uppercase px-3 py-1.5 rounded-full border font-medium ${accent.badge}`}>
+                        {item.time}
+                      </span>
+                      <span className="text-[10px] font-mono text-white/35 tracking-[0.3em] flex-shrink-0">
+                        LOG_{String(idx + 1).padStart(2, "0")}
+                      </span>
                     </div>
-                    
-                    <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-6 leading-tight group-hover:text-cyan-50 transition-colors">
+
+                    {/* Org */}
+                    <p className="relative z-10 text-[11px] font-mono text-white/50 uppercase tracking-[0.25em] mb-3">
+                      {item.org}
+                    </p>
+
+                    {/* Title */}
+                    <h3 className="relative z-10 text-xl md:text-2xl font-bold tracking-tight text-white mb-4 leading-snug">
                       {item.title}
                     </h3>
-                    
-                    <p className="text-base md:text-lg text-white/50 font-light leading-relaxed mb-8">
+
+                    {/* Summary */}
+                    <p className="relative z-10 text-sm md:text-[0.95rem] text-white/72 leading-relaxed mb-5">
                       {item.summary}
                     </p>
-                    
-                    {item.bullets && (
-                      <div className={`flex flex-col gap-4 mb-8 w-full ${isLeft ? 'items-start text-left' : 'items-end text-right'}`}>
+
+                    {/* Bullets */}
+                    {item.bullets && item.bullets.length > 0 && (
+                      <ul className="relative z-10 flex flex-col gap-2.5 mb-5">
                         {item.bullets.map((b, i) => (
-                          <div key={i} className={`flex items-start gap-4 ${isLeft ? '' : 'flex-row-reverse'}`}>
-                            <span className="text-cyan-500 font-mono text-sm mt-1 opacity-60">{'//'}</span>
-                            <p className="text-sm md:text-base text-white/70 font-light leading-relaxed">{b}</p>
-                          </div>
+                          <li key={i} className="flex items-start gap-3">
+                            <span className="text-white/30 font-mono text-xs mt-0.5 flex-shrink-0">//</span>
+                            <p className="text-sm text-white/75 leading-relaxed">{b}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {/* Tags */}
+                    {item.tags && item.tags.length > 0 && (
+                      <div className="relative z-10 flex flex-wrap gap-2 pt-4 border-t border-white/[0.08]">
+                        {item.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-[10px] font-mono uppercase tracking-wider text-white/50 border border-white/[0.12] rounded-full px-3 py-1 bg-white/[0.03] hover:text-white/75 hover:border-white/25 transition-colors duration-200"
+                          >
+                            {tag}
+                          </span>
                         ))}
                       </div>
                     )}
-
-                    <div className={`flex flex-wrap gap-2 ${isLeft ? 'justify-start' : 'justify-end'}`}>
-                      {item.tags?.map((tag) => (
-                        <span key={tag} className="text-[9px] font-mono uppercase tracking-widest text-white/40 border border-white/10 rounded-full px-4 py-1.5 backdrop-blur-sm group-hover:border-cyan-500/30 group-hover:text-cyan-100 transition-colors duration-300">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
+
       </Container>
     </section>
   );

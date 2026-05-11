@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Navbar } from "@/components/navbar";
+import BubbleMenu, { type BubbleMenuItem } from "@/components/ui/bubble-menu";
 import { HeroSection } from "@/sections/hero";
 import { AboutSection } from "@/sections/about";
 import { SkillsSection } from "@/sections/skills";
@@ -12,8 +12,54 @@ import { Footer } from "@/sections/footer";
 import { BootSequence } from "@/components/animations/boot-sequence";
 import { HeroAboutTransition, AboutProjectsTransition, BreathingSpace } from "@/sections/transitions";
 import { CinematicTransition } from "@/components/transitions/cinematic-transition";
+import Image from "next/image";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
+
+const NAV_ITEMS: BubbleMenuItem[] = [
+  {
+    label: "home",
+    href: "#home",
+    ariaLabel: "Home",
+    rotation: -8,
+    hoverStyles: { bgColor: "#22d3ee", textColor: "#000000" },
+  },
+  {
+    label: "about",
+    href: "#about",
+    ariaLabel: "About",
+    rotation: 8,
+    hoverStyles: { bgColor: "#8b5cf6", textColor: "#ffffff" },
+  },
+  {
+    label: "skills",
+    href: "#skills",
+    ariaLabel: "Skills",
+    rotation: -8,
+    hoverStyles: { bgColor: "#3b82f6", textColor: "#ffffff" },
+  },
+  {
+    label: "projects",
+    href: "#projects",
+    ariaLabel: "Projects",
+    rotation: 8,
+    hoverStyles: { bgColor: "#f59e0b", textColor: "#000000" },
+  },
+  {
+    label: "journey",
+    href: "#journey",
+    ariaLabel: "Journey",
+    rotation: -8,
+    hoverStyles: { bgColor: "#10b981", textColor: "#ffffff" },
+  },
+  {
+    label: "contact",
+    href: "#contact",
+    ariaLabel: "Contact",
+    rotation: 8,
+    hoverStyles: { bgColor: "#ec4899", textColor: "#ffffff" },
+  },
+];
 
 export default function Home() {
   const [bootComplete, setBootComplete] = useState(false);
@@ -44,7 +90,26 @@ export default function Home() {
         This allows GSAP and Lenis to accurately calculate the full layout height.
       */}
       <div className={`transition-opacity duration-1000 ${bootComplete ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-        <Navbar />
+        <BubbleMenu
+          logo={
+            <Image
+              src="/logo.png"
+              alt="HS Lab"
+              width={36}
+              height={36}
+              className="rounded-md object-contain"
+              priority
+            />
+          }
+          items={NAV_ITEMS}
+          menuAriaLabel="Toggle navigation"
+          menuBg="#111111"
+          menuContentColor="#ffffff"
+          useFixedPosition={true}
+          animationEase="back.out(1.5)"
+          animationDuration={0.5}
+          staggerDelay={0.12}
+        />
         <HeroSection />
         
         <CinematicTransition type="descent">
@@ -67,9 +132,7 @@ export default function Home() {
         
         <BreathingSpace text="RETRIEVING_MEMORY_LOGS" color="purple" />
         
-        <CinematicTransition type="dissolve">
-          <JourneySection />
-        </CinematicTransition>
+        <JourneySection />
         
         <BreathingSpace text="INITIATING_FINAL_SEQUENCE" color="emerald" />
         

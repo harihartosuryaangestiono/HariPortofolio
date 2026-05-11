@@ -7,6 +7,7 @@ import { ABOUT } from "@/lib/profile";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
+import ScrollReveal from "@/components/ui/scroll-reveal";
 
 export function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -19,27 +20,29 @@ export function AboutSection() {
     const cards = gsap.utils.toArray(".about-card");
 
     // Reveal Text
-    gsap.fromTo(textRef.current, 
-      { opacity: 0, y: 50, filter: "blur(10px)" },
-      { 
-        opacity: 1, y: 0, filter: "blur(0px)", 
-        duration: 1.5, ease: "power3.out",
+    gsap.fromTo(textRef.current,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1, y: 0,
+        duration: 1.2, ease: "power3.out",
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 70%",
+          start: "top 72%",
+          toggleActions: "play none none none",
         }
       }
     );
 
     // Reveal Cards
-    gsap.fromTo(cards, 
-      { opacity: 0, y: 50, filter: "blur(10px)" },
-      { 
-        opacity: 1, y: 0, filter: "blur(0px)", 
-        duration: 1.5, stagger: 0.15, ease: "power3.out",
+    gsap.fromTo(cards,
+      { opacity: 0, y: 36 },
+      {
+        opacity: 1, y: 0,
+        duration: 1.1, stagger: 0.12, ease: "power3.out",
         scrollTrigger: {
           trigger: cardsRef.current,
           start: "top 80%",
+          toggleActions: "play none none none",
         }
       }
     );
@@ -77,8 +80,18 @@ export function AboutSection() {
               </div>
               
               <h3 className="text-4xl sm:text-6xl font-bold tracking-tight text-white mb-6">
-                Engineering with <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+                <ScrollReveal
+                  blurStrength={4}
+                  baseRotation={2}
+                  baseOpacity={0.18}
+                  stagger={0.07}
+                  duration={1.0}
+                  triggerStart="top 78%"
+                >
+                  Engineering with
+                </ScrollReveal>
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500">
                   Precision.
                 </span>
               </h3>

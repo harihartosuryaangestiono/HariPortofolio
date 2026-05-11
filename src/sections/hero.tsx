@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { ArrowUpRight, Mail } from "lucide-react";
+import { ArrowUpRight, Mail, Download } from "lucide-react";
 import { Container } from "@/components/container";
 import { Button } from "@/components/button";
 import { PROFILE } from "@/lib/profile";
@@ -57,13 +57,13 @@ export function HeroSection() {
       }
     });
 
-    // Camera push illusion (scaling the entire container, translating Z)
+    // Forward Camera Push Illusion
     tl.to(contentRef.current, {
-      scale: 0.7,
+      scale: 2,
       opacity: 0,
-      z: -500,
-      rotationX: 5,
-      ease: "none"
+      z: 500,
+      filter: "blur(8px)",
+      ease: "power2.in"
     }, 0);
 
     tl.to(".hero-glow", {
@@ -121,13 +121,34 @@ export function HeroSection() {
               {PROFILE.tagline}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 sm:items-center justify-center">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-4 sm:items-center justify-center">
               <Button href={PROFILE.navCtas.projects} variant="primary" className="shadow-[0_0_30px_rgba(34,211,238,0.3)] hover:shadow-[0_0_50px_rgba(34,211,238,0.5)] hover:scale-105 transition-all duration-300 border-none px-8 py-6 text-sm font-bold tracking-wider">
                 INITIALIZE PROJECTS <ArrowUpRight className="h-4 w-4 ml-2" />
               </Button>
               <Button href={PROFILE.navCtas.contact} variant="secondary" className="border-white/20 hover:bg-white/10 hover:border-cyan-400/50 hover:text-cyan-300 transition-all duration-300 px-8 py-6 text-sm font-bold tracking-wider bg-black/50 backdrop-blur-md">
                 ESTABLISH UPLINK <Mail className="h-4 w-4 ml-2" />
               </Button>
+              {/* ── Download CV — holographic glassmorphic button ── */}
+              <a
+                href={PROFILE.cvUrl}
+                download="Hariharto_Surya_CV.pdf"
+                className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-full border border-white/22 bg-white/[0.05] px-8 py-[0.875rem] text-sm font-bold tracking-wider text-white/75 backdrop-blur-md transition-all duration-300 hover:border-cyan-400/45 hover:bg-white/[0.09] hover:text-white hover:shadow-[0_0_32px_rgba(34,211,238,0.18)] hover:-translate-y-[2px] active:scale-95 cursor-pointer select-none"
+              >
+                {/* Shimmer sweep on hover */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
+                  style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent)" }}
+                />
+                {/* Subtle top-edge glow line */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute top-0 left-[20%] right-[20%] h-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{ background: "linear-gradient(90deg, transparent, rgba(34,211,238,0.6), transparent)" }}
+                />
+                <Download className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-y-[1px]" />
+                <span className="relative z-10">ACCESS RESUME</span>
+              </a>
             </div>
           </div>
 

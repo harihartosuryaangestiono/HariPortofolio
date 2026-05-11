@@ -9,6 +9,7 @@ export type Project = {
   impact?: string;
   tags: string[];
   imageSrc: string;
+  videoSrc?: string;
   liveUrl?: string;
   githubUrl?: string;
 };
@@ -22,7 +23,8 @@ export const PROJECTS: Project[] = [
     problemSolved: "Lack of centralized, accessible, and privacy-first information for individuals facing social and emotional challenges.",
     impact: "Created a calming, secure environment for users to find essential resources and support anonymously.",
     tags: ["Next.js", "React", "Tailwind CSS", "Privacy-first", "UI/UX"],
-    imageSrc: "/projects/dashboard.svg",
+    imageSrc: "/projects/terangi.png",
+    liveUrl: "https://terangi.vercel.app/",
   },
   {
     slug: "sop-verification",
@@ -35,13 +37,13 @@ export const PROJECTS: Project[] = [
     imageSrc: "/projects/inventory.svg",
   },
   {
-    slug: "ai-autocaption",
-    name: "AI AutoCaption & Emotion Detection",
-    category: "ai",
-    description: "An AI-powered automatic caption generation system combining speech recognition, audio analysis, and facial emotion detection.",
-    problemSolved: "Time-consuming manual video subtitling and lack of automated emotional context analysis.",
-    impact: "Enabled dynamic, context-aware subtitles and rapid video processing pipeline.",
-    tags: ["Python", "OpenAI Whisper", "OpenCV", "dlib", "librosa"],
+    slug: "unpar-scraper",
+    name: "UNPAR Scraper — Sistem Manajemen Publikasi Dosen Terintegrasi",
+    category: "systems",
+    description: "A web-based integrated platform for automated scraping, synchronization, and visualization of UNPAR lecturer publication data from multiple academic sources.",
+    problemSolved: "Fragmented, manual tracking of lecturer publication outputs across isolated academic repositories with zero centralized monitoring or analytics visibility.",
+    impact: "Automated real-time publication monitoring for 48+ UNPAR lecturers — structured, synchronized, and instantly queryable via a unified intelligence dashboard.",
+    tags: ["Python", "Flask", "Selenium", "BeautifulSoup4", "React", "Vite", "PostgreSQL", "Recharts", "Socket.IO"],
     imageSrc: "/projects/consultation.svg",
   },
   {
