@@ -2,14 +2,16 @@ import type { SectionId } from "@/lib/sections";
 
 export const PROFILE = {
   name: "Hariharto Surya",
+  brand: "HS Labs",
   location: "Bandung, Indonesia",
-  title: "Web App & System Developer",
-  tagline: "Building scalable, efficient, and impactful digital solutions.",
+  title: "Fullstack Developer • System Builder • AI Enthusiast",
+  tagline: "Building Digital Systems for Real-World Solutions",
   email: "hariharto.surya@gmail.com",
   phone: "+62 811-333-156",
   socials: {
     github: "https://github.com/your-username",
     linkedin: "https://www.linkedin.com/in/your-handle",
+    whatsapp: "https://wa.me/62811333156",
   },
   cvUrl: "/Hariharto_Surya_CV.pdf",
   navCtas: {
@@ -20,16 +22,19 @@ export const PROFILE = {
 
 export const ABOUT = {
   intro:
-    "I’m an Informatics Engineering undergraduate at Parahyangan Catholic University with hands-on experience delivering web products through academic and freelance projects—focused on building systems that feel fast, clear, and dependable.",
+    "Informatics Engineering undergraduate with experience building real-world web applications, operational systems, and AI-powered solutions through freelance and academic projects.",
   focusAreas: [
-    "Web Application Development",
-    "System Architecture",
-    "Database Design",
+    "Fullstack Web Development",
+    "AI Systems",
+    "Operational Management Systems",
+    "UI/UX Design",
+    "Business Workflow Solutions",
+    "Problem Solving",
   ],
   strengths: [
-    "Problem solving with pragmatic trade-offs",
-    "Clean, maintainable code and predictable delivery",
-    "Scalable systems thinking (performance, data, reliability)",
+    "Building systems and solving operational/business problems",
+    "Architecting scalable and resilient solutions",
+    "Delivering seamless cinematic digital experiences",
   ],
 };
 
@@ -40,31 +45,30 @@ export const SKILLS = [
       { name: "React", level: 4 },
       { name: "Next.js", level: 4 },
       { name: "Tailwind CSS", level: 4 },
-      { name: "UI/UX", level: 4 },
+      { name: "UI/UX Explorer", level: 4 },
     ],
   },
   {
     group: "Backend",
     items: [
-      { name: "Node.js", level: 3 },
-      { name: "API Development", level: 4 },
+      { name: "Node.js", level: 4 },
       { name: "Python", level: 4 },
+      { name: "JavaScript", level: 4 },
     ],
   },
   {
-    group: "Database",
+    group: "Database & Cloud",
     items: [
       { name: "SQL", level: 4 },
-      { name: "PostgreSQL", level: 3 },
-      { name: "MySQL", level: 3 },
+      { name: "PostgreSQL", level: 4 },
+      { name: "Supabase", level: 4 },
     ],
   },
   {
-    group: "Tools",
+    group: "AI & Tech",
     items: [
-      { name: "Git", level: 4 },
-      { name: "Vercel", level: 4 },
-      { name: "Figma", level: 3 },
+      { name: "OpenAI API", level: 4 },
+      { name: "AI Systems", level: 4 },
     ],
   },
 ] as const;
@@ -80,17 +84,24 @@ export type TimelineItem = {
 
 export const JOURNEY: TimelineItem[] = [
   {
-    title: "Python Developer — AI AutoCaption System (Freelance)",
+    title: "Freelance Projects",
+    org: "Independent",
+    time: "Ongoing",
+    summary:
+      "Developing various operational systems, POS systems, laundry management systems, and QR wedding systems for real-world business needs.",
+    tags: ["Fullstack", "System Builder", "Operations"],
+  },
+  {
+    title: "AI AutoCaption System (Freelance)",
     org: "International Client",
     time: "Jun 2025 — Aug 2025",
     summary:
-      "Built an end-to-end AutoCaption AI pipeline combining speech-to-text and emotion overlays for dynamic subtitles.",
+      "Built an end-to-end AutoCaption AI pipeline combining speech recognition, audio analysis, and facial emotion detection.",
     bullets: [
-      "Implemented transcription with OpenAI Whisper in a modular, reproducible setup.",
-      "Integrated face detection + basic emotion tracking via facial landmarks.",
-      "Composited video/audio overlays using MoviePy + OpenCV for final outputs.",
+      "Implemented transcription with OpenAI Whisper.",
+      "Integrated face detection and emotion tracking via facial landmarks.",
     ],
-    tags: ["Python", "Whisper", "OpenCV", "MoviePy", "librosa", "dlib"],
+    tags: ["Python", "Whisper", "OpenCV", "librosa", "dlib"],
   },
   {
     title: "Company Profile Website (Freelance)",
@@ -98,12 +109,7 @@ export const JOURNEY: TimelineItem[] = [
     time: "Jan 2025",
     summary:
       "Delivered a responsive company profile site with a clean, professional layout and performance-first front-end implementation.",
-    bullets: [
-      "Built responsive UI tailored to stakeholder requirements.",
-      "Optimized performance and usability for a fast browsing experience.",
-      "Collaborated directly with stakeholders to iterate quickly.",
-    ],
-    tags: ["HTML", "CSS", "JavaScript", "Responsive UI", "Optimization"],
+    tags: ["HTML", "CSS", "JavaScript", "Optimization"],
   },
   {
     title: "Head of Event — ISEC 2023",

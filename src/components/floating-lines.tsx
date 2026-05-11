@@ -297,13 +297,31 @@ export default function FloatingLines({
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    
+    try {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (!gl) {
+        console.warn('WebGL is not supported in this environment.');
+        return;
+      }
+    } catch (e) {
+      console.warn('WebGL check failed.', e);
+      return;
+    }
 
     let active = true;
     const scene = new Scene();
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
     camera.position.z = 1;
 
-    const renderer = new WebGLRenderer({ antialias: true, alpha: false });
+    let renderer: WebGLRenderer;
+    try {
+      renderer = new WebGLRenderer({ antialias: true, alpha: false });
+    } catch (e) {
+      console.warn("WebGL is not supported or context creation failed.", e);
+      return;
+    }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.domElement.style.width = "100%";
     renderer.domElement.style.height = "100%";

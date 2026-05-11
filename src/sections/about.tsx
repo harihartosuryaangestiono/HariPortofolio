@@ -1,71 +1,130 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
 import { Container } from "@/components/container";
-import { Section, SectionHeader } from "@/components/section";
+import { Section } from "@/components/section";
 import { ABOUT } from "@/lib/profile";
-
-function Chip({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/72">
-      {children}
-    </span>
-  );
-}
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
 export function AboutSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    const cards = gsap.utils.toArray(".about-card");
+
+    // Reveal Text
+    gsap.fromTo(textRef.current, 
+      { opacity: 0, y: 50, filter: "blur(10px)" },
+      { 
+        opacity: 1, y: 0, filter: "blur(0px)", 
+        duration: 1.5, ease: "power3.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 70%",
+        }
+      }
+    );
+
+    // Reveal Cards
+    gsap.fromTo(cards, 
+      { opacity: 0, y: 50, filter: "blur(10px)" },
+      { 
+        opacity: 1, y: 0, filter: "blur(0px)", 
+        duration: 1.5, stagger: 0.15, ease: "power3.out",
+        scrollTrigger: {
+          trigger: cardsRef.current,
+          start: "top 80%",
+        }
+      }
+    );
+
+    // Background Parallax
+    gsap.to(".about-bg-glow", {
+      y: 200,
+      ease: "none",
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: true,
+      }
+    });
+
+  }, { scope: sectionRef });
+
   return (
-    <Section id="about" className="border-t-0">
-      <Container>
-        <SectionHeader
-          eyebrow="About"
-          title="Builder mindset, systems clarity."
-          description="A short snapshot of how I work and what I focus on."
-        />
+    <section id="about" ref={sectionRef} className="relative overflow-hidden py-32 border-b border-white/5 bg-[#030712] flex items-center w-full min-h-[100svh]">
+      <div className="absolute inset-0 w-full h-full">
+        {/* Decorative gradient blur & Grid */}
+        <div className="about-bg-glow absolute top-0 left-0 w-[800px] h-[800px] bg-cyan-600/10 rounded-full blur-[150px] pointer-events-none -translate-x-1/2 -translate-y-1/4" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
 
-        <div className="grid gap-6 lg:grid-cols-12">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-            className="lg:col-span-7 rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8 backdrop-blur"
-          >
-            <p className="text-sm sm:text-base leading-8 text-white/72">
-              {ABOUT.intro}
-            </p>
+        <Container className="h-full flex items-center justify-center pt-20 pb-20">
+          <div className="grid gap-16 lg:grid-cols-12 items-center relative z-10 w-full">
+            <div
+              ref={textRef}
+              className="lg:col-span-5 transform-gpu will-change-transform"
+            >
+              <div className="inline-flex items-center gap-2 rounded text-[10px] font-mono font-medium uppercase tracking-widest text-cyan-400 mb-6">
+                <span className="h-2 w-2 bg-cyan-400 animate-pulse" />
+                IDENTITY_CHAMBER.SYS
+              </div>
+              
+              <h3 className="text-4xl sm:text-6xl font-bold tracking-tight text-white mb-6">
+                Engineering with <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">
+                  Precision.
+                </span>
+              </h3>
+              
+              <div className="h-px w-full bg-gradient-to-r from-cyan-400/50 to-transparent mb-8" />
+              
+              <p className="text-lg text-white/60 leading-relaxed font-light mb-8">
+                {ABOUT.intro}
+              </p>
 
-            <div className="mt-6 flex flex-wrap gap-2">
-              {ABOUT.focusAreas.map((x) => (
-                <Chip key={x}>{x}</Chip>
+              <div className="flex flex-col gap-4">
+                <span className="text-xs font-mono text-white/40 uppercase tracking-widest border-b border-white/10 pb-2 inline-block w-fit">Core Strengths</span>
+                {ABOUT.strengths.map((str, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="h-[1px] w-6 bg-cyan-500/50" />
+                    <span className="text-sm font-medium text-white/80">{str}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div ref={cardsRef} className="lg:col-span-7 grid gap-4 sm:grid-cols-2 relative z-10">
+              {ABOUT.focusAreas.map((area, idx) => (
+                <div
+                  key={area}
+                  className="about-card group relative rounded-xl border border-white/10 bg-black/40 p-6 backdrop-blur-xl hover:bg-black/60 hover:border-cyan-400/40 transition-all duration-500 overflow-hidden transform-gpu will-change-transform"
+                >
+                  {/* Scanline effect */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-400/10 to-transparent translate-y-[-100%] group-hover:animate-[scanline_2s_linear_infinite]" />
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-10 h-10 rounded border border-cyan-400/30 bg-cyan-400/5 flex items-center justify-center shadow-[inset_0_0_10px_rgba(34,211,238,0.1)]">
+                        <span className="text-cyan-400 text-xs font-mono font-bold">{String(idx + 1).padStart(2, '0')}</span>
+                      </div>
+                      <span className="text-[10px] text-white/20 font-mono tracking-widest">OK</span>
+                    </div>
+                    <h4 className="text-white font-medium text-lg leading-snug group-hover:text-cyan-300 transition-colors">{area}</h4>
+                  </div>
+                </div>
               ))}
             </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.45, ease: "easeOut", delay: 0.05 }}
-            className="lg:col-span-5 rounded-3xl border border-white/10 bg-gradient-to-b from-white/7 to-white/4 p-6 sm:p-8 backdrop-blur"
-          >
-            <p className="text-xs tracking-[0.22em] uppercase text-white/55">
-              Strengths
-            </p>
-            <ul className="mt-4 grid gap-3">
-              {ABOUT.strengths.map((s) => (
-                <li
-                  key={s}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/72"
-                >
-                  {s}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        </div>
-      </Container>
-    </Section>
+          </div>
+        </Container>
+      </div>
+    </section>
   );
 }
 

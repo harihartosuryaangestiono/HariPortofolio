@@ -1,110 +1,149 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Mail } from "lucide-react";
+import { useRef } from "react";
+import { ArrowUpRight, Mail } from "lucide-react";
 import { Container } from "@/components/container";
 import { Button } from "@/components/button";
 import { PROFILE } from "@/lib/profile";
+import { AnimatedBackground } from "@/components/ui/animated-background";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 
 function GradientBackdrop() {
   return (
-    <div aria-hidden className="absolute inset-0 overflow-hidden">
-      <motion.div
-        className="absolute -top-32 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-500/22 via-fuchsia-400/10 to-cyan-300/18 blur-3xl"
-        animate={{ y: [0, 16, 0], opacity: [0.9, 0.75, 0.9] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute -bottom-36 right-[10%] h-[420px] w-[680px] rounded-full bg-gradient-to-r from-cyan-400/14 to-violet-500/12 blur-3xl"
-        animate={{ y: [0, -14, 0], opacity: [0.85, 0.7, 0.85] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <div className="absolute inset-0 [background:radial-gradient(circle_at_20%_10%,rgba(255,255,255,0.08),transparent_40%),radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.06),transparent_35%)] opacity-70" />
+    <div aria-hidden className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="hero-glow absolute top-[20%] left-1/2 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 blur-[100px]" />
+      <div className="hero-grid absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
     </div>
   );
 }
 
 export function HeroSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Initial ambient animations
+    gsap.to(".hero-glow", {
+      y: 20,
+      opacity: 0.8,
+      scale: 1.05,
+      duration: 8,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut"
+    });
+
+    gsap.to(".scroll-dot", {
+      y: 24,
+      duration: 1.5,
+      repeat: -1,
+      ease: "power2.inOut",
+      yoyo: true
+    });
+
+    // Pinned cinematic scroll sequence
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top top",
+        end: "+=150%",
+        pin: true,
+        scrub: 0.5,
+      }
+    });
+
+    // Camera push illusion (scaling the entire container, translating Z)
+    tl.to(contentRef.current, {
+      scale: 0.7,
+      opacity: 0,
+      z: -500,
+      rotationX: 5,
+      ease: "none"
+    }, 0);
+
+    tl.to(".hero-glow", {
+      scale: 2,
+      opacity: 0,
+      ease: "none"
+    }, 0);
+
+    tl.to(".hero-grid", {
+      z: 500,
+      scale: 1.5,
+      opacity: 0,
+      ease: "none"
+    }, 0);
+
+    tl.to(scrollIndicatorRef.current, {
+      opacity: 0,
+      y: 50,
+      ease: "power1.inOut"
+    }, 0);
+
+  }, { scope: sectionRef });
+
   return (
     <section
       id="home"
-      className="relative border-b border-white/8"
+      ref={sectionRef}
+      className="relative h-[100svh] overflow-hidden bg-black flex items-center justify-center border-b border-white/5 w-full"
     >
-      <GradientBackdrop />
+      <div className="absolute inset-0 w-full h-full" style={{ perspective: "1000px" }}>
+        <AnimatedBackground />
+        <GradientBackdrop />
 
-      <Container className="relative">
-        <div className="min-h-[88svh] pt-20 sm:pt-24 pb-14 md:pb-16 flex items-center">
-          <div className="w-full">
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, ease: "easeOut" }}
-              className="max-w-3xl"
-            >
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/70 backdrop-blur">
-                <span className="h-1.5 w-1.5 rounded-full bg-cyan-300/70 shadow-[0_0_0_6px_rgba(34,211,238,0.08)]" />
-                Available for freelance & collaborations
-              </div>
+        <Container className="relative z-10 h-full flex flex-col justify-center">
+          <div
+            ref={contentRef}
+            className="w-full flex flex-col items-center text-center mt-[-5svh] transform-gpu will-change-transform"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/5 px-4 py-2 text-xs font-mono font-medium text-cyan-300 backdrop-blur-md mb-8">
+              <span className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)] animate-pulse" />
+              SYSTEM_ONLINE :: {PROFILE.brand}
+            </div>
 
-              <h1 className="mt-6 text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-[1.06]">
-                <span className="text-white/70">Hi, I’m</span>{" "}
-                <span className="bg-gradient-to-r from-white via-white to-white/70 bg-clip-text text-transparent">
-                  {PROFILE.name}
-                </span>
-                <span className="text-white/70">.</span>
-              </h1>
+            <h1 className="text-6xl sm:text-8xl md:text-9xl font-bold tracking-tighter leading-[1.0] mb-6">
+              <span className="bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent drop-shadow-sm">
+                {PROFILE.name}
+              </span>
+            </h1>
 
-              <p className="mt-4 text-lg sm:text-xl text-white/70 leading-8">
-                <span className="text-white/88 font-medium">
-                  {PROFILE.title}
-                </span>{" "}
-                — {PROFILE.tagline}
-              </p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-medium text-cyan-50 mb-6 tracking-wide drop-shadow-md">
+              {PROFILE.title}
+            </p>
 
-              <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center">
-                <Button href={PROFILE.navCtas.projects} variant="secondary">
-                  View Projects <ArrowUpRight className="h-4 w-4 text-white/70" />
-                </Button>
-                <Button href={PROFILE.navCtas.contact} variant="primary">
-                  Contact Me <Mail className="h-4 w-4 text-white/70" />
-                </Button>
-              </div>
+            <p className="text-lg sm:text-xl text-white/50 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
+              {PROFILE.tagline}
+            </p>
 
-              <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-w-2xl">
-                {[
-                  { k: "Focus", v: "Web Apps & Systems" },
-                  { k: "Location", v: PROFILE.location },
-                  { k: "Strength", v: "Fast, clean delivery" },
-                ].map((item) => (
-                  <div
-                    key={item.k}
-                    className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur hover:bg-white/7 transition-colors"
-                  >
-                    <p className="text-[11px] tracking-[0.2em] uppercase text-white/55">
-                      {item.k}
-                    </p>
-                    <p className="mt-2 text-sm font-medium text-white/82">
-                      {item.v}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            <div className="mt-14 flex justify-center sm:justify-start">
-              <a
-                href="#about"
-                className="group inline-flex items-center gap-2 text-xs text-white/60 hover:text-white/80 transition-colors"
-              >
-                <span className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/5 group-hover:bg-white/8 transition-colors">
-                  <ArrowDown className="h-4 w-4" />
-                </span>
-                Scroll to explore
-              </a>
+            <div className="flex flex-col sm:flex-row gap-6 sm:items-center justify-center">
+              <Button href={PROFILE.navCtas.projects} variant="primary" className="shadow-[0_0_30px_rgba(34,211,238,0.3)] hover:shadow-[0_0_50px_rgba(34,211,238,0.5)] hover:scale-105 transition-all duration-300 border-none px-8 py-6 text-sm font-bold tracking-wider">
+                INITIALIZE PROJECTS <ArrowUpRight className="h-4 w-4 ml-2" />
+              </Button>
+              <Button href={PROFILE.navCtas.contact} variant="secondary" className="border-white/20 hover:bg-white/10 hover:border-cyan-400/50 hover:text-cyan-300 transition-all duration-300 px-8 py-6 text-sm font-bold tracking-wider bg-black/50 backdrop-blur-md">
+                ESTABLISH UPLINK <Mail className="h-4 w-4 ml-2" />
+              </Button>
             </div>
           </div>
-        </div>
-      </Container>
+
+          <div 
+            ref={scrollIndicatorRef}
+            className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-1000 delay-1000 fill-mode-both"
+          >
+            <span className="text-[10px] uppercase tracking-[0.3em] text-cyan-500/80 font-bold">
+              SCROLL TO EXPLORE
+            </span>
+            <div className="flex h-16 w-8 items-start justify-center rounded-full border border-white/20 p-1.5 transition-colors hover:border-cyan-400/80 backdrop-blur-sm">
+              <div className="scroll-dot h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+            </div>
+          </div>
+        </Container>
+      </div>
     </section>
   );
 }
