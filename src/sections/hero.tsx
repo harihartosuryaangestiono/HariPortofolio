@@ -151,19 +151,20 @@ export function HeroSection() {
               </a>
             </div>
           </div>
-
-          <div 
-            ref={scrollIndicatorRef}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-1000 delay-1000 fill-mode-both"
-          >
-            <span className="text-[10px] uppercase tracking-[0.3em] text-cyan-500/80 font-bold">
-              SCROLL TO EXPLORE
-            </span>
-            <div className="flex h-16 w-8 items-start justify-center rounded-full border border-white/20 p-1.5 transition-colors hover:border-cyan-400/80 backdrop-blur-sm">
-              <div className="scroll-dot h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
-            </div>
-          </div>
         </Container>
+
+        {/* Scroll indicator — outside Container so it centers on full viewport width */}
+        <div
+          ref={scrollIndicatorRef}
+          className="absolute bottom-12 left-0 right-0 z-20 flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-1000 delay-1000 fill-mode-both pointer-events-none"
+        >
+          <span className="text-[10px] uppercase tracking-[0.3em] text-cyan-500/80 font-bold">
+            SCROLL TO EXPLORE
+          </span>
+          <div className="flex h-16 w-8 items-start justify-center rounded-full border border-white/20 p-1.5 backdrop-blur-sm">
+            <div className="scroll-dot h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+          </div>
+        </div>
       </div>
     </section>
   );

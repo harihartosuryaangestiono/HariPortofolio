@@ -1,3 +1,9 @@
+# Large video files (exceed GitHub 100MB limit — serve from CDN or local only)
+*.mp4
+*.mov
+*.avi
+*.webm
+
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies

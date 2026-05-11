@@ -1,11 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { PROJECTS, type Project } from "@/lib/projects";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { ArrowUpRight } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, Play, Pause, Volume2, VolumeX, X } from "lucide-react";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import { CardContainer, CardItem } from "@/components/ui/3d-card";
 
@@ -74,87 +76,293 @@ const DEFAULT_THEME: Theme = {
 // ─────────────────────────────────────────────────────────────
 // Inline CSS command-center dashboard for UNPAR Scraper
 // ─────────────────────────────────────────────────────────────
-function ScraperDashboard() {
-  const bars = [22, 38, 28, 52, 35, 64, 45, 72, 38, 58, 80, 55, 90, 68, 75];
+// ─────────────────────────────────────────────────────────────
+// Expanded interactive video modal (renders via portal)
+// ─────────────────────────────────────────────────────────────
+function ExpandedVideoModal({ src, onClose }: { src: string; onClose: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.play().then(() => setPlaying(true)).catch(() => {});
+    const onTime = () => {
+      setCurrentTime(v.currentTime);
+      if (v.duration) setProgress((v.currentTime / v.duration) * 100);
+    };
+    const onMeta = () => setDuration(v.duration);
+    const onEnded = () => setPlaying(false);
+    v.addEventListener("timeupdate", onTime);
+    v.addEventListener("loadedmetadata", onMeta);
+    v.addEventListener("ended", onEnded);
+    return () => {
+      v.removeEventListener("timeupdate", onTime);
+      v.removeEventListener("loadedmetadata", onMeta);
+      v.removeEventListener("ended", onEnded);
+    };
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === " ") {
+        e.preventDefault();
+        const v = videoRef.current;
+        if (!v) return;
+        if (v.paused) { v.play(); setPlaying(true); }
+        else { v.pause(); setPlaying(false); }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) { v.play(); setPlaying(true); }
+    else { v.pause(); setPlaying(false); }
+  };
+
+  const toggleMute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setMuted(v.muted);
+  };
+
+  const seek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = videoRef.current;
+    if (!v || !v.duration) return;
+    const pct = Number(e.target.value);
+    v.currentTime = (pct / 100) * v.duration;
+    setProgress(pct);
+  };
+
+  const fmt = (t: number) =>
+    `${Math.floor(t / 60)}:${Math.floor(t % 60).toString().padStart(2, "0")}`;
+
   return (
-    <div className="absolute inset-0 flex flex-col bg-[#020f14] font-mono overflow-hidden select-none">
-      {/* Scanlines */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: "repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(45,212,191,0.018) 2px,rgba(45,212,191,0.018) 4px)" }} />
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22 }}
+      className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-10"
+      onClick={onClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/88 backdrop-blur-md" />
 
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-teal-400/15 bg-teal-400/[0.03]">
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[8px] tracking-[0.32em] uppercase text-teal-300">SCRAPER ENGINE · ACTIVE</span>
-        </div>
-        <span className="text-[8px] text-teal-400/35 tracking-[0.2em]">UNPAR PUB SYS v2.1</span>
-      </div>
+      {/* Modal */}
+      <motion.div
+        initial={{ scale: 0.88, opacity: 0, y: 24 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.92, opacity: 0, y: 10 }}
+        transition={{ type: "spring", stiffness: 300, damping: 26, mass: 0.8 }}
+        className="relative z-10 w-full max-w-5xl rounded-2xl overflow-hidden"
+        style={{
+          border: "1px solid rgba(45,212,191,0.28)",
+          boxShadow: "0 0 90px rgba(45,212,191,0.14), 0 40px 100px rgba(0,0,0,0.7)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ── Video area ── */}
+        <div className="relative bg-black aspect-video cursor-pointer" onClick={togglePlay}>
+          <video
+            ref={videoRef}
+            src={src}
+            className="w-full h-full object-cover"
+            playsInline
+          />
 
-      {/* Stats row */}
-      <div className="grid grid-cols-3 gap-0 border-b border-teal-400/10">
-        {[
-          { val: "1,247", label: "PUBLICATIONS", col: "text-white" },
-          { val: "48", label: "LECTURERS", col: "text-teal-300" },
-          { val: "12", label: "SOURCES", col: "text-emerald-400" },
-        ].map(({ val, label, col }, i) => (
-          <div key={label} className={`text-center py-3 ${i < 2 ? "border-r border-teal-400/10" : ""}`}>
-            <div className={`text-sm font-bold ${col}`}>{val}</div>
-            <div className="text-[7px] text-white/28 tracking-widest mt-0.5">{label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Bar chart */}
-      <div className="flex-1 px-4 py-3">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[7px] text-teal-400/45 tracking-widest">PUBLICATION VOLUME</span>
-          <span className="text-[7px] text-emerald-400/65">▲ 23% THIS MONTH</span>
-        </div>
-        <div className="flex items-end gap-[2px] h-14">
-          {bars.map((h, i) => (
+          {/* Paused play overlay */}
+          <div
+            className="absolute inset-0 flex items-center justify-center transition-opacity duration-200"
+            style={{ opacity: playing ? 0 : 1, pointerEvents: playing ? "none" : "auto" }}
+          >
             <div
-              key={i}
-              className="flex-1 rounded-t-[1px] transition-all duration-700"
-              style={{ height: `${h}%`, background: i >= 12 ? "rgba(45,212,191,0.75)" : "rgba(45,212,191,0.22)" }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Data table */}
-      <div className="px-4 pb-3">
-        <div className="rounded-lg overflow-hidden border border-teal-400/12">
-          <div className="grid grid-cols-3 bg-teal-400/[0.06] px-3 py-1.5">
-            {["DOSEN", "PUBLIKASI", "STATUS"].map((h) => (
-              <span key={h} className="text-[6.5px] text-teal-400/45 tracking-widest">{h}</span>
-            ))}
-          </div>
-          {[
-            ["Dr. Ahmad S.", "24 papers", "SYNCED"],
-            ["Prof. Santoso", "18 papers", "SYNCED"],
-            ["Dr. Lestari", "31 papers", "SYNC..."],
-          ].map(([name, count, status]) => (
-            <div key={name} className="grid grid-cols-3 px-3 py-1.5 border-t border-teal-400/8">
-              <span className="text-[7px] text-white/55">{name}</span>
-              <span className="text-[7px] text-teal-300/65">{count}</span>
-              <span className={`text-[7px] ${
-                status === "SYNC..." ? "text-amber-400 animate-pulse" : "text-emerald-400"
-              }`}>{status}</span>
+              className="w-20 h-20 rounded-full flex items-center justify-center backdrop-blur-sm"
+              style={{
+                background: "rgba(0,0,0,0.55)",
+                border: "1px solid rgba(45,212,191,0.5)",
+                boxShadow: "0 0 30px rgba(45,212,191,0.25)",
+              }}
+            >
+              <Play className="w-7 h-7 text-teal-300 ml-1" />
             </div>
-          ))}
+          </div>
+
+          {/* Top HUD */}
+          <div
+            className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-3"
+            style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.75), transparent)" }}
+          >
+            <div className="flex items-center gap-2 pointer-events-none">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[9px] font-mono tracking-[0.28em] text-teal-300 uppercase">
+                UNPAR Scraper · Live Demo
+              </span>
+            </div>
+            <button
+              className="w-7 h-7 rounded-full flex items-center justify-center transition-colors hover:bg-white/10"
+              style={{ border: "1px solid rgba(255,255,255,0.14)" }}
+              onClick={(e) => { e.stopPropagation(); onClose(); }}
+            >
+              <X className="w-3.5 h-3.5 text-white/55" />
+            </button>
+          </div>
         </div>
+
+        {/* ── Controls bar ── */}
+        <div
+          className="flex items-center gap-3 px-4 py-3"
+          style={{ background: "#010c15", borderTop: "1px solid rgba(45,212,191,0.12)" }}
+        >
+          {/* Play/Pause */}
+          <button
+            onClick={togglePlay}
+            className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-teal-400/10"
+            style={{ border: "1px solid rgba(45,212,191,0.25)" }}
+          >
+            {playing
+              ? <Pause className="w-3.5 h-3.5 text-teal-300" />
+              : <Play className="w-3.5 h-3.5 text-teal-300 ml-0.5" />}
+          </button>
+
+          {/* Time */}
+          <span className="text-[10px] font-mono text-white/30 flex-shrink-0 tabular-nums">
+            {fmt(currentTime)} / {fmt(duration)}
+          </span>
+
+          {/* Seek bar */}
+          <div
+            className="relative flex-1 h-1.5 rounded-full cursor-pointer"
+            style={{ background: "rgba(255,255,255,0.08)" }}
+          >
+            <div
+              className="absolute left-0 top-0 h-full rounded-full transition-all duration-100"
+              style={{ width: `${progress}%`, background: "rgba(45,212,191,0.75)" }}
+            />
+            <input
+              type="range" min="0" max="100" step="0.1"
+              value={progress}
+              onChange={seek}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+          </div>
+
+          {/* Mute */}
+          <button
+            onClick={toggleMute}
+            className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-teal-400/10"
+            style={{ border: "1px solid rgba(45,212,191,0.25)" }}
+          >
+            {muted
+              ? <VolumeX className="w-3.5 h-3.5 text-white/40" />
+              : <Volume2 className="w-3.5 h-3.5 text-teal-300" />}
+          </button>
+
+          {/* ESC hint */}
+          <span className="flex-shrink-0 text-[9px] font-mono tracking-[0.22em] text-white/22 ml-1 hidden sm:block">
+            ESC
+          </span>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// UNPAR Scraper — clean video card + expand-to-play modal
+// ─────────────────────────────────────────────────────────────
+function ScraperShowcase() {
+  const [expanded, setExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  return (
+    <>
+      {/* ── Autoplay muted preview card ── */}
+      <div
+        className="absolute inset-0 overflow-hidden bg-[#010c15] group/scraper cursor-pointer"
+        onClick={() => setExpanded(true)}
+      >
+        <video
+          autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover/scraper:scale-[1.04]"
+          style={{ opacity: 0.9 }}
+        >
+          <source src="/projects/unpar-scraper.mp4" type="video/mp4" />
+        </video>
+
+        {/* Teal atmospheric bloom */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse 80% 70% at 50% 40%, rgba(45,212,191,0.055) 0%, transparent 65%)" }}
+        />
+        {/* Scanlines */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(45,212,191,0.01) 2px, rgba(45,212,191,0.01) 4px)" }}
+        />
+
+        {/* Hover overlay + open button */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover/scraper:bg-black/28 transition-all duration-400">
+          <div className="flex flex-col items-center gap-3 opacity-0 group-hover/scraper:opacity-100 transition-all duration-300 translate-y-3 group-hover/scraper:translate-y-0">
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center backdrop-blur-sm"
+              style={{
+                background: "rgba(0,0,0,0.6)",
+                border: "1px solid rgba(45,212,191,0.55)",
+                boxShadow: "0 0 35px rgba(45,212,191,0.28)",
+              }}
+            >
+              <Play className="w-6 h-6 text-teal-300 ml-0.5" />
+            </div>
+            <span className="text-[8px] font-mono tracking-[0.38em] text-teal-300 uppercase">Open System</span>
+          </div>
+        </div>
+
+        {/* HUD top bar */}
+        <div
+          className="absolute top-0 left-0 right-0 flex items-center justify-between px-3 py-2 pointer-events-none"
+          style={{ background: "linear-gradient(to bottom, rgba(1,12,21,0.7), transparent)" }}
+        >
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[7px] font-mono tracking-[0.32em] text-teal-300 uppercase">Live Preview</span>
+          </div>
+          <span className="text-[7px] font-mono text-teal-400/35 tracking-[0.18em]">UNPAR_SYS v2.1</span>
+        </div>
+
+        {/* Corner brackets */}
+        <div className="absolute top-0 left-0 w-5 h-5 border-t border-l border-teal-400/45 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-5 h-5 border-t border-r border-teal-400/45 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-teal-400/25 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-teal-400/25 pointer-events-none" />
       </div>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between px-4 py-2 border-t border-teal-400/10 bg-black/20">
-        <div className="flex items-center gap-1.5">
-          <div className="w-1 h-1 rounded-full bg-teal-400 animate-ping" />
-          <span className="text-[7px] text-white/28 tracking-wider">SYNC IN PROGRESS</span>
-        </div>
-        <span className="text-[7px] text-white/18 tracking-wider">LAST_UPDATE: NOW</span>
-      </div>
-    </div>
+      {/* ── Expanded video modal via portal ── */}
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {expanded && (
+              <ExpandedVideoModal
+                src="/projects/unpar-scraper.mp4"
+                onClose={() => setExpanded(false)}
+              />
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
+    </>
   );
 }
 
@@ -223,7 +431,7 @@ function ProjectPanel({
                   className="w-full h-full object-cover"
                 />
               ) : project.slug === "unpar-scraper" ? (
-                <ScraperDashboard />
+                <ScraperShowcase />
               ) : (
                 <img
                   src={project.imageSrc}

@@ -44,7 +44,7 @@ export const PROJECTS: Project[] = [
     problemSolved: "Fragmented, manual tracking of lecturer publication outputs across isolated academic repositories with zero centralized monitoring or analytics visibility.",
     impact: "Automated real-time publication monitoring for 48+ UNPAR lecturers — structured, synchronized, and instantly queryable via a unified intelligence dashboard.",
     tags: ["Python", "Flask", "Selenium", "BeautifulSoup4", "React", "Vite", "PostgreSQL", "Recharts", "Socket.IO"],
-    imageSrc: "/projects/consultation.svg",
+    imageSrc: "/projects/unpar-scraper-mockup.png",
   },
   {
     slug: "plywood-trading",
