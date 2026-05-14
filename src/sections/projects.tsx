@@ -7,9 +7,11 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Play, Pause, Volume2, VolumeX, X } from "lucide-react";
+import { ArrowUpRight, Play, Pause, Volume2, VolumeX, X, Layers } from "lucide-react";
 import ScrollReveal from "@/components/ui/scroll-reveal";
 import { CardContainer, CardItem } from "@/components/ui/3d-card";
+import { ProjectDetailPortal } from "@/components/project-detail";
+import { GALLERY_ITEMS, type GalleryItem } from "@/lib/gallery";
 
 // ─────────────────────────────────────────────────────────────
 // Theme map — accent per project
@@ -375,12 +377,14 @@ function ProjectPanel({
   isActive,
   activeIndex,
   total,
+  onOpenDetail,
 }: {
   project: Project;
   index: number;
   isActive: boolean;
   activeIndex: number;
   total: number;
+  onOpenDetail?: () => void;
 }) {
   const theme = THEMES[project.slug] ?? DEFAULT_THEME;
   const nameParts = project.name.split("—").map((s) => s.trim());
@@ -424,6 +428,15 @@ function ProjectPanel({
               {project.videoSrc ? (
                 <video
                   src={project.videoSrc}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              ) : project.slug === "sop-verification" ? (
+                <video
+                  src="/projects/sop-desktop.mp4"
                   autoPlay
                   muted
                   loop
@@ -528,7 +541,7 @@ function ProjectPanel({
           </div>
 
           {/* Tech tags */}
-          <div className="flex flex-wrap gap-2 mb-8">
+          <div className="flex flex-wrap gap-2 mb-6">
             {project.tags.map((tag) => (
               <span
                 key={tag}
@@ -539,22 +552,56 @@ function ProjectPanel({
             ))}
           </div>
 
-          {/* CTA */}
-          {project.liveUrl ? (
-            <a
-              href={project.liveUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`group inline-flex items-center gap-2.5 text-sm font-mono font-semibold border rounded-full px-5 py-2.5 transition-colors duration-250 w-fit ${theme.ctaBg}`}
-            >
-              View Project
-              <ArrowUpRight className="h-4 w-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
-            </a>
-          ) : (
-            <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">
-              In Portfolio
-            </span>
-          )}
+          {/* CTA row */}
+          <div className="flex items-center gap-3 flex-wrap">
+            {project.liveUrl ? (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`group inline-flex items-center gap-2.5 text-sm font-mono font-semibold border rounded-full px-5 py-2.5 transition-colors duration-250 w-fit ${theme.ctaBg}`}
+              >
+                View Project
+                <ArrowUpRight className="h-4 w-4 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
+              </a>
+            ) : (
+              <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">
+                In Portfolio
+              </span>
+            )}
+
+            {/* DETAIL PROJECT button — only for projects that have a GalleryItem detail */}
+            {onOpenDetail && (
+              <motion.button
+                onClick={onOpenDetail}
+                whileHover={{ scale: 1.04, y: -1 }}
+                whileTap={{ scale: 0.97 }}
+                className="group relative inline-flex items-center gap-2 text-[11px] font-mono font-semibold tracking-[0.18em] uppercase px-5 py-2.5 rounded-full overflow-hidden cursor-pointer"
+                style={{
+                  background: "linear-gradient(135deg, rgba(129,140,248,0.15) 0%, rgba(34,211,238,0.08) 100%)",
+                  border: "1px solid rgba(129,140,248,0.35)",
+                  boxShadow: "0 0 24px rgba(129,140,248,0.12), inset 0 1px 0 rgba(255,255,255,0.1)",
+                  color: "rgba(199,210,254,0.9)",
+                }}
+              >
+                {/* Animated border glow sweep */}
+                <span
+                  className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(129,140,248,0.25) 0%, rgba(34,211,238,0.15) 100%)",
+                    boxShadow: "0 0 40px rgba(129,140,248,0.25), inset 0 1px 0 rgba(255,255,255,0.18)",
+                  }}
+                />
+                {/* Shimmer sweep */}
+                <span
+                  className="absolute top-0 left-[-75%] w-[50%] h-full skew-x-[-15deg] opacity-0 group-hover:opacity-100 group-hover:left-[125%] transition-all duration-700"
+                  style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent)" }}
+                />
+                <Layers className="w-3.5 h-3.5 relative z-10" />
+                <span className="relative z-10">Detail Project</span>
+              </motion.button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -587,6 +634,10 @@ export function ProjectsSection() {
   const showcaseRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [detailItem, setDetailItem] = useState<GalleryItem | null>(null);
+
+  // Pre-find the SOP gallery item (has videoSrc + full case study data)
+  const sopGalleryItem = GALLERY_ITEMS.find((g) => g.id === "sop-dashboard") ?? null;
 
   const showcaseProjects = PROJECTS.slice(0, 4);
   const NUM = showcaseProjects.length;
@@ -635,7 +686,7 @@ export function ProjectsSection() {
 
   return (
     <>
-      {/* ── Section header — normal vertical scroll, not pinned ── */}
+      {/* ── Section header ── */}
       <div
         id="projects"
         ref={headerRef}
@@ -666,7 +717,7 @@ export function ProjectsSection() {
         </div>
       </div>
 
-      {/* ── Horizontal cinematic viewport — this element gets pinned ── */}
+      {/* ── Horizontal cinematic viewport ── */}
       <div
         ref={showcaseRef}
         className="relative h-screen overflow-hidden bg-black"
@@ -684,10 +735,21 @@ export function ProjectsSection() {
               isActive={activeIndex === idx}
               activeIndex={activeIndex}
               total={NUM}
+              onOpenDetail={
+                project.slug === "sop-verification" && sopGalleryItem
+                  ? () => setDetailItem(sopGalleryItem)
+                  : undefined
+              }
             />
           ))}
         </div>
       </div>
+
+      {/* ── SOP Project Detail Portal ── */}
+      <ProjectDetailPortal
+        item={detailItem}
+        onClose={() => setDetailItem(null)}
+      />
     </>
   );
 }

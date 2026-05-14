@@ -6,6 +6,7 @@ import { HeroSection } from "@/sections/hero";
 import { AboutSection } from "@/sections/about";
 import { SkillsSection } from "@/sections/skills";
 import { ProjectsSection } from "@/sections/projects";
+import { GallerySection } from "@/sections/gallery";
 import { JourneySection } from "@/sections/journey";
 import { ContactSection } from "@/sections/contact";
 import { Footer } from "@/sections/footer";
@@ -44,6 +45,13 @@ const NAV_ITEMS: BubbleMenuItem[] = [
     ariaLabel: "Projects",
     rotation: 8,
     hoverStyles: { bgColor: "#f59e0b", textColor: "#000000" },
+  },
+  {
+    label: "gallery",
+    href: "#gallery",
+    ariaLabel: "Gallery",
+    rotation: -8,
+    hoverStyles: { bgColor: "#8b5cf6", textColor: "#ffffff" },
   },
   {
     label: "journey",
@@ -103,8 +111,8 @@ export default function Home() {
           }
           items={NAV_ITEMS}
           menuAriaLabel="Toggle navigation"
-          menuBg="#111111"
-          menuContentColor="#ffffff"
+          menuBg="transparent"
+          menuContentColor="rgba(255,255,255,0.85)"
           useFixedPosition={true}
           animationEase="back.out(1.5)"
           animationDuration={0.5}
@@ -123,6 +131,10 @@ export default function Home() {
         </CinematicTransition>
         
         <ProjectsSection />
+        
+        <BreathingSpace text="LOADING_VISUAL_ARCHIVE" color="purple" />
+        
+        <GallerySection />
         
         <BreathingSpace text="ACCESSING_CORE_REACTOR" color="cyan" />
         

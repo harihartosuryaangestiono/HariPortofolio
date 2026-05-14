@@ -5,6 +5,21 @@ import { createPortal } from "react-dom";
 import { gsap } from "gsap";
 import "./bubble-menu.css";
 
+/** Convert #rrggbb or #rgb hex to "r, g, b" string for CSS custom property */
+function hexToRgb(hex: string): string {
+  const h = hex.replace("#", "");
+  if (h.length === 3) {
+    const r = parseInt(h[0] + h[0], 16);
+    const g = parseInt(h[1] + h[1], 16);
+    const b = parseInt(h[2] + h[2], 16);
+    return `${r}, ${g}, ${b}`;
+  }
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `${r}, ${g}, ${b}`;
+}
+
 type HoverStyles = {
   bgColor?: string;
   textColor?: string;
@@ -248,8 +263,10 @@ export default function BubbleMenu({
                       "--pill-bg": menuBg,
                       "--pill-color": menuContentColor,
                       "--hover-bg": item.hoverStyles?.bgColor || "#f3f4f6",
-                      "--hover-color":
-                        item.hoverStyles?.textColor || menuContentColor,
+                      "--hover-color": item.hoverStyles?.textColor || menuContentColor,
+                      "--hover-accent-rgb": item.hoverStyles?.bgColor
+                        ? hexToRgb(item.hoverStyles.bgColor)
+                        : "139, 92, 246",
                     } as CSSProperties
                   }
                   ref={(el) => {
