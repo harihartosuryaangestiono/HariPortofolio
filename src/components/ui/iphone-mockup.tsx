@@ -46,7 +46,10 @@ export function IPhoneMockup({
 
   // Ensure video plays (some browsers block autoPlay programmatically)
   useEffect(() => {
-    videoRef.current?.play().catch(() => {/* silently ignore */});
+    const video = videoRef.current;
+    if (!video) return;
+    video.play().catch(() => {/* silently ignore AbortError */});
+    return () => { video.pause(); };
   }, [videoSrc]);
 
   return (
@@ -203,7 +206,6 @@ export function IPhoneMockup({
                 <video
                   ref={videoRef}
                   src={videoSrc}
-                  autoPlay
                   muted
                   loop
                   playsInline

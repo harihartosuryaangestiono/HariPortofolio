@@ -23,6 +23,8 @@ export function HeroAboutTransition() {
   }, []);
 
   useGSAP(() => {
+    if (debris.length === 0) return;
+
     gsap.registerPlugin(ScrollTrigger);
 
     const tl = gsap.timeline({
@@ -50,7 +52,7 @@ export function HeroAboutTransition() {
       { scale: 1, opacity: 0.3, duration: 1, ease: "power2.out" }, 0.2
     );
 
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [debris], revertOnUpdate: true });
 
   return (
     <div ref={containerRef} className="relative h-[60svh] w-full bg-black overflow-hidden flex flex-col items-center justify-center">

@@ -57,6 +57,8 @@ export function ContactSection() {
   }, []);
 
   useGSAP(() => {
+    if (particles.length === 0) return;
+
     gsap.registerPlugin(ScrollTrigger);
 
     const tl = gsap.timeline({
@@ -122,7 +124,7 @@ export function ContactSection() {
       ease: "power2.out"
     }, 9);
 
-  }, { scope: sectionRef });
+  }, { scope: sectionRef, dependencies: [particles], revertOnUpdate: true });
 
   const disabled = useMemo(() => {
     return (
